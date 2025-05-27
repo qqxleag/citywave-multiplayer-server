@@ -1,0 +1,20 @@
+{
+  "name": "citywave-multiplayer-server",
+  "version": "1.0.0",
+  "description": "Multiplayer WebSocket server for City Wave game",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "ws": "^8.14.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["websocket", "multiplayer", "game", "telegram"],
+  "author": "City Wave Team",
+  "license": "MIT"
+}
