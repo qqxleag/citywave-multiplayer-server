@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const http = require('http');
 const { v4: uuidv4 } = require('uuid');
 
 class MultiplayerServer {
@@ -11,12 +12,38 @@ class MultiplayerServer {
     }
     
     initializeServer() {
+        // Create HTTP server for healthcheck
+        this.server = http.createServer((req, res) => {
+            if (req.url === '/' || req.url === '/health') {
+                res.writeHead(200, { 
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                });
+                res.end(JSON.stringify({
+                    status: 'ok',
+                    message: 'WebSocket Multiplayer Server is running',
+                    players: this.players.size,
+                    uptime: process.uptime()
+                }));
+            } else {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('Not Found');
+            }
+        });
+
+        // Create WebSocket server using the HTTP server
         this.wss = new WebSocket.Server({ 
-            port: this.port,
+            server: this.server,
             perMessageDeflate: false 
         });
         
-        console.log(`🚀 Multiplayer server started on port ${this.port}`);
+        // Start the server
+        this.server.listen(this.port, () => {
+            console.log(`🚀 Multiplayer server started on port ${this.port}`);
+            console.log(`📍 HTTP healthcheck available at http://localhost:${this.port}/health`);
+            console.log(`📍 WebSocket available at ws://localhost:${this.port}`);
+        });
+        
         console.log(`📍 Players can connect to ws://localhost:${this.port}`);
         
         this.wss.on('connection', (ws, req) => {
